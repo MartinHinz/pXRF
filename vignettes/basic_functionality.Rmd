@@ -6,8 +6,10 @@ output:
   rmarkdown::html_vignette:
 vignette: >
   %\VignetteIndexEntry{basic_functionality}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -46,8 +48,13 @@ sep <- ";"
 lod <- 0.0
 
 # Elemente- und Oxidnamen laden
-data("elements")
-data("oxides")
+elements <- data.frame(symbol = c("H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe", "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn", "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og" ))
+
+elements$error <- paste0(elements$symbol, ".Error")
+
+oxides <- data.frame(symbol = c("SiO2", "TiO2", "Al2O3", "MnO", "MgO", "CaO", "K2O", "P2O5", "Fe2O3"))
+
+oxides$error <- paste0(oxides$symbol, ".Error")
 
 # Die eigentlichen Daten laden
 pxrf_data <- read.csv(source_csv, dec = dec, sep = sep, na.strings = "< LOD")
@@ -104,29 +111,30 @@ pxrf_data.fine_calibration$S <- pxrf_data.fine_calibration$S * 1.3
 pxrf_data.fine_calibration$Mg <- pxrf_data.fine_calibration$Mg * 0.78
 ```
 
-Alternativ kann man auch eine im Rahmen dieses Paketes entwickelte Kurzfunktion nutzen
+Alternativ kann man bald auch eine im Rahmen dieses Paketes entwickelte Kurzfunktion nutzen
 
 ```{r}
-pxrf_data.fine_calibration2 <- pXRF::fine_calibration_mineral(pxrf_data)
+# pxrf_data.fine_calibration <- pXRF::fine_calibration_mineral(pxrf_data)
 ```
+
 Nun sollte man noch die Meta-Daten aus dem ursprünglichen Datensatz hinzufügen
 
 ```{r}
-pxrf_data.fine_calibration2[,meta_columns] <- pxrf_data[,meta_columns]
+pxrf_data.fine_calibration[,meta_columns] <- pxrf_data[,meta_columns]
 ```
 
 
 Jetzt können wir die Daten zwischenzeitlich abspeichern
 
 ```{r}
-write.csv(pxrf_data.fine_calibration2, "data_feinkalibriert.csv")
+write.csv(pxrf_data.fine_calibration, "data_feinkalibriert.csv")
 ```
 
 Jetzt legen wir fest, welches die Haupt- und welches die Spurenelemente für unsere Untersuchung sind. Diese Listen sind ggf. zu ändern:
 
 ```{r}
-pxrf_data.main_elements<-pxrf_data.fine_calibration2[,c("Si","Ti","Al","Fe","Mn","Mg","Ca","K","P")]  # Gleiche die Fribourg verwendet. Evt. Auswahl treffen je nach Sample
-pxrf_data.trace_elements<-pxrf_data.fine_calibration2[,c("Nb","Zr","Y","Sr","Rb","Th","Pb","Zn","Cu","Ni","Cr","V","Ba","S")] # Evt. Auswahl z.B. Cu und S weglassen
+pxrf_data.main_elements<-pxrf_data.fine_calibration[,c("Si","Ti","Al","Fe","Mn","Mg","Ca","K","P")]  # Gleiche die Fribourg verwendet. Evt. Auswahl treffen je nach Sample
+pxrf_data.trace_elements<-pxrf_data.fine_calibration[,c("Nb","Zr","Y","Sr","Rb","Th","Pb","Zn","Cu","Ni","Cr","V","Ba","S")] # Evt. Auswahl z.B. Cu und S weglassen
 ```
 
 Desweiteren können wir nun die Oxide mittels Transformationsfaktoren berechnen:
