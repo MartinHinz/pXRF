@@ -238,6 +238,27 @@ data.pca_log10 <- prcomp(log10(data.for_pca+0.1))
 ggord(data.pca_log10, groups, vec_ext = 5, exp = c(.1,.1))
 ```
 
+## Clusteranalyse
+
+```{r}
+data.dist <- dist(data)
+data.hclust <- hclust(data.dist)
+plot(data.hclust)
+```
+
+```{r}
+plot(data.hclust,labels = groups)
+```
+
+```{r}
+data.clusters <- cutree(data.hclust, k=4)
+plot(data.pca$x[,1],data.pca$x[,2], col = data.clusters)
+```
+
+```{r}
+data.kmeans <- kmeans(data, 4)
+plot(data.pca$x[,1],data.pca$x[,2], col = data.kmeans$cluster)
+```
 
 ## Diskriminanzanalyse (lda)
 

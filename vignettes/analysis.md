@@ -122,7 +122,6 @@ Das gleiche nochmal etwas schöner, unter Nutzung einer vordefinierten Funktion
 
 ```r
 library(car)
-#> Lade nötiges Paket: carData
 scatterplotMatrix(data[,c("Ca", "K", "Al")],
                   diagonal=list(method ="histogram", breaks="FD"),
                   smooth=FALSE)
@@ -374,6 +373,39 @@ ggord(data.pca_log10, groups, vec_ext = 5, exp = c(.1,.1))
 
 ![plot of chunk unnamed-chunk-26](figure/unnamed-chunk-26-1.png)
 
+## Clusteranalyse
+
+
+```r
+data.dist <- dist(data)
+data.hclust <- hclust(data.dist)
+plot(data.hclust)
+```
+
+![plot of chunk unnamed-chunk-27](figure/unnamed-chunk-27-1.png)
+
+
+```r
+plot(data.hclust,labels = groups)
+```
+
+![plot of chunk unnamed-chunk-28](figure/unnamed-chunk-28-1.png)
+
+
+```r
+data.clusters <- cutree(data.hclust, k=4)
+plot(data.pca$x[,1],data.pca$x[,2], col = data.clusters)
+```
+
+![plot of chunk unnamed-chunk-29](figure/unnamed-chunk-29-1.png)
+
+
+```r
+data.kmeans <- kmeans(data, 4)
+plot(data.pca$x[,1],data.pca$x[,2], col = data.kmeans$cluster)
+```
+
+![plot of chunk unnamed-chunk-30](figure/unnamed-chunk-30-1.png)
 
 ## Diskriminanzanalyse (lda)
 
@@ -448,7 +480,7 @@ Die Werte zeigen zuerst die Anteile der jeweiligen Gruppen, dann deren Mittelwer
 plot(data.lda)
 ```
 
-![plot of chunk unnamed-chunk-28](figure/unnamed-chunk-28-1.png)
+![plot of chunk unnamed-chunk-32](figure/unnamed-chunk-32-1.png)
 
 Schöner mit Paketen, die auf ggplot basieren:
 
@@ -457,5 +489,5 @@ Schöner mit Paketen, die auf ggplot basieren:
 ggord(data.lda, data.for_lda$groups, vec_ext = 40, exp = c(.1,.1))
 ```
 
-![plot of chunk unnamed-chunk-29](figure/unnamed-chunk-29-1.png)
+![plot of chunk unnamed-chunk-33](figure/unnamed-chunk-33-1.png)
 
