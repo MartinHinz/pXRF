@@ -29,10 +29,12 @@ Zuerst laden wir die bereinigten Daten ein:
 # Oder durch einen fest angestellten Pfad
 source_csv <- "data_feinkalibriert.csv"
 
-all_data <- read.csv(source_csv, row.names = 1)
+all_data <- read.csv(source_csv, row.names = "SAMPLE")
 ```
 
-Gegebenfalls können wir die Daten nun noch auf ein Kriterium hin filter, z.B. bezüglich des Messmodus (Type). Die zu filternde Spalte und den zu filternden Wert kann man entsprechend den Notwendigkeiten austauschen.
+An dieser Stelle gehe ich davon aus, das eindeutige Probennamen existieren. Dies sollte auf jeden Fall so sein, und sollte das Kommando zu Laden einen Fehler auswerfen, dann müsste hier geschaut werde!
+
+Gegebenfalls können wir die Daten nun noch auf ein Kriterium hin filtern, z.B. bezüglich des Messmodus (Type). Die zu filternde Spalte und den zu filternden Wert kann man entsprechend den Notwendigkeiten austauschen.
 
 
 ```r
@@ -394,7 +396,10 @@ Eine weitere Möglichkeit, die Daten vorzubehandeln, um den Einfluss extremer We
 
 ```r
 data.pca_log10 <- prcomp(log10(data.for_pca+0.1))
+biplot(data.pca_log10)
 ```
+
+![plot of chunk unnamed-chunk-29](figure/unnamed-chunk-29-1.png)
 
 ## Schönere Darstellung mit ggplot
 
@@ -442,16 +447,23 @@ ggord(data.pca_scaled, vec_ext = 5, exp = c(.1,.1))
 
 ![plot of chunk unnamed-chunk-33](figure/unnamed-chunk-33-1.png)
 
+Wir können auch die Probenamen verwenden:
+
+
+```r
+ggord(data.pca_scaled, vec_ext = 5, exp = c(.1,.1), obslab = T)
+```
+
+![plot of chunk unnamed-chunk-34](figure/unnamed-chunk-34-1.png)
+
 Wenn wir jetzt vordefinierte Gruppen haben, können wir diese im Plot kenntlich machen
 
 
 ```r
-library(ggord)
-
 ggord(data.pca_scaled, grp_in = groups, vec_ext = 5, exp = c(.1,.1))
 ```
 
-![plot of chunk unnamed-chunk-34](figure/unnamed-chunk-34-1.png)
+![plot of chunk unnamed-chunk-35](figure/unnamed-chunk-35-1.png)
 
 Ebenso können wir alle skalierten und transformierten PCAs darstellen:
 
@@ -460,7 +472,7 @@ Ebenso können wir alle skalierten und transformierten PCAs darstellen:
 ggord(data.pca_log10, groups, vec_ext = 5, exp = c(.1,.1))
 ```
 
-![plot of chunk unnamed-chunk-35](figure/unnamed-chunk-35-1.png)
+![plot of chunk unnamed-chunk-36](figure/unnamed-chunk-36-1.png)
 
 ## Clusteranalyse
 
@@ -491,7 +503,7 @@ Zur Darstellung des Clusterbaums kann man nun das entstandene Objekt einfach mit
 plot(data.hclust)
 ```
 
-![plot of chunk unnamed-chunk-38](figure/unnamed-chunk-38-1.png)
+![plot of chunk unnamed-chunk-39](figure/unnamed-chunk-39-1.png)
 
 An den einzelnen Ästen des Baumes sind am Ende jeweils die Zeilen Namen der Objekte angetragen. Man kann diese jedoch auch zum Beispiel durch die Gruppenzugehörigkeit ersetzen. Hierzu wird die gewünschte Variable als "labels" mit angegeben
 
@@ -500,7 +512,7 @@ An den einzelnen Ästen des Baumes sind am Ende jeweils die Zeilen Namen der Obj
 plot(data.hclust,labels = groups)
 ```
 
-![plot of chunk unnamed-chunk-39](figure/unnamed-chunk-39-1.png)
+![plot of chunk unnamed-chunk-40](figure/unnamed-chunk-40-1.png)
 
 Eine hierarchische Clusteranalyse produziert nicht ausschliesslich eine Lösung, sondern einen Ähnlichkeitsbaum. Möchten wir uns nun auf eine Anzahl von Clustern festlegen, so müssen wir "diesen Baum fällen". Der Befehl hier zu lautet cutree().
 
@@ -508,8 +520,16 @@ Eine hierarchische Clusteranalyse produziert nicht ausschliesslich eine Lösung,
 ```r
 data.clusters <- cutree(data.hclust, k=4)
 data.clusters
-#>  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
-#>  1  1  1  1  1  1  1  1  2  2  2  1  3  3  3  3  3  1  3  3  3  4  4  4  4  4  4  4  4  4
+#> Bodmerton_trocken_01 Bodmerton_trocken_02 Bodmerton_trocken_03 Bodmerton_trocken_04 Bodmerton_trocken_05        Bodenprobe_01 
+#>                    1                    1                    1                    1                    1                    1 
+#>        Bodenprobe_02        Bodenprobe_03        Bodenprobe_04        Bodenprobe_05        Bodenprobe_06        Bodenprobe_07 
+#>                    1                    1                    2                    2                    2                    1 
+#>           Keramik_01           Keramik_02           Keramik_03           Keramik_04           Keramik_05           Keramik_06 
+#>                    3                    3                    3                    3                    3                    1 
+#>           Keramik_07           Keramik_08           Keramik_09             Silex_01             Silex_02             Silex_03 
+#>                    3                    3                    3                    4                    4                    4 
+#>             Silex_04             Silex_05             Silex_06             Silex_07             Silex_08             Silex_09 
+#>                    4                    4                    4                    4                    4                    4
 ```
 
 Die daraus abgeleiteten Gruppen Zugehörigkeiten können wir nun nutzen, um eine Darstellung, zum Beispiel eine Hauptkomponentenanalyse, mit den abgeleiteten Gruppen ein zu färben.
@@ -519,7 +539,7 @@ Die daraus abgeleiteten Gruppen Zugehörigkeiten können wir nun nutzen, um eine
 plot(data.pca$x[,1],data.pca$x[,2], col = data.clusters)
 ```
 
-![plot of chunk unnamed-chunk-41](figure/unnamed-chunk-41-1.png)
+![plot of chunk unnamed-chunk-42](figure/unnamed-chunk-42-1.png)
 
 Ein weiteres Clusterverfahren ist das so genannte kmeans-Verfahren. Dieses produziert häufig bessere Ergebnisse, verlangt aber, dass die Daten in euklidischen Distanz vorliegen. Zudem muss man vorher angeben, wie viel Cluster man erwartet. Genau diese Anzahl von Clustern wird dann auch eingeteilt.
 
@@ -535,7 +555,7 @@ Auch diese Lösung können wir dann verwenden, um eine Darstellung entsprechend 
 plot(data.pca$x[,1],data.pca$x[,2], col = data.kmeans$cluster)
 ```
 
-![plot of chunk unnamed-chunk-43](figure/unnamed-chunk-43-1.png)
+![plot of chunk unnamed-chunk-44](figure/unnamed-chunk-44-1.png)
 
 ## Diskriminanzanalyse (lda)
 
@@ -610,7 +630,7 @@ Die Werte zeigen zuerst die Anteile der jeweiligen Gruppen, dann deren Mittelwer
 plot(data.lda)
 ```
 
-![plot of chunk unnamed-chunk-45](figure/unnamed-chunk-45-1.png)
+![plot of chunk unnamed-chunk-46](figure/unnamed-chunk-46-1.png)
 
 Schöner mit Paketen, die auf ggplot basieren:
 
@@ -619,5 +639,5 @@ Schöner mit Paketen, die auf ggplot basieren:
 ggord(data.lda, data.for_lda$groups, vec_ext = 40, exp = c(.1,.1))
 ```
 
-![plot of chunk unnamed-chunk-46](figure/unnamed-chunk-46-1.png)
+![plot of chunk unnamed-chunk-47](figure/unnamed-chunk-47-1.png)
 

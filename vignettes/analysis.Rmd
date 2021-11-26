@@ -33,10 +33,12 @@ Zuerst laden wir die bereinigten Daten ein:
 # Oder durch einen fest angestellten Pfad
 source_csv <- "data_feinkalibriert.csv"
 
-all_data <- read.csv(source_csv, row.names = 1)
+all_data <- read.csv(source_csv, row.names = "SAMPLE")
 ```
 
-Gegebenfalls können wir die Daten nun noch auf ein Kriterium hin filter, z.B. bezüglich des Messmodus (Type). Die zu filternde Spalte und den zu filternden Wert kann man entsprechend den Notwendigkeiten austauschen.
+An dieser Stelle gehe ich davon aus, das eindeutige Probennamen existieren. Dies sollte auf jeden Fall so sein, und sollte das Kommando zu Laden einen Fehler auswerfen, dann müsste hier geschaut werde!
+
+Gegebenfalls können wir die Daten nun noch auf ein Kriterium hin filtern, z.B. bezüglich des Messmodus (Type). Die zu filternde Spalte und den zu filternden Wert kann man entsprechend den Notwendigkeiten austauschen.
 
 ```{r}
 data_ausw<-subset(all_data, Type == "Mining")
@@ -252,6 +254,7 @@ Eine weitere Möglichkeit, die Daten vorzubehandeln, um den Einfluss extremer We
 
 ```{r}
 data.pca_log10 <- prcomp(log10(data.for_pca+0.1))
+biplot(data.pca_log10)
 ```
 
 ## Schönere Darstellung mit ggplot
@@ -294,11 +297,15 @@ library(ggord)
 ggord(data.pca_scaled, vec_ext = 5, exp = c(.1,.1))
 ```
 
+Wir können auch die Probenamen verwenden:
+
+```{r}
+ggord(data.pca_scaled, vec_ext = 5, exp = c(.1,.1), obslab = T)
+```
+
 Wenn wir jetzt vordefinierte Gruppen haben, können wir diese im Plot kenntlich machen
 
 ```{r}
-library(ggord)
-
 ggord(data.pca_scaled, grp_in = groups, vec_ext = 5, exp = c(.1,.1))
 ```
 
