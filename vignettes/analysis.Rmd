@@ -240,23 +240,58 @@ ggord(data.pca_log10, groups, vec_ext = 5, exp = c(.1,.1))
 
 ## Clusteranalyse
 
+Die Clusteranalyse ist ein Werkzeug, um Gruppenzugehörigkeit aufgrund von unterschiedlichen Merkmalen mittels eines Algorithmus zu definieren. Hierbei werden aufgrund von unterschiedlichen Verfahren Ähnlichkeiten zwischen den einzelnen Objekten festgelegt, und dann die jenigen Objekte zu Gruppen zusammen gefügt, die sich am ähnlichsten sind.
+
+Hierzu gibt es verschiedene Herangehensweisen. Eine Variante ist die so genannte hierarchische Clusteranalyse, bei der schrittweise Objekte in absteigender Ähnlichkeit zu einander zusammen gepackt werden. Hieraus entsteht ein so genannter Baum, der angebt, in welcher Reihenfolge Gruppierungen vorgenommen worden sind.
+
+Da wir es mit Messwerten zu tun haben, können wir für die Bestimmung von Ähnlichkeiten die euklidische Distanz benutzen. Das ist das Distanzmass, dass man auch aus dem Alltag kennt. Man kann es als Abstand in Bezug auf X und Y Koordinaten sehen. Mathematisch können aber auch beliebig viele Dimensionen berücksichtigt werden.
+
+Die Funktion, um diese Distanzen zu berechnen, ist die Funktion dist(). Ohne weitere Angabe der Distanzfunktion wird euklidische Distanz hiermit berechnet.
+
 ```{r}
 data.dist <- dist(data)
-data.hclust <- hclust(data.dist)
+```
+
+Die eigentliche Gruppierung in Cluster erfolgt nun mittels der Funktion hclust(). Auch für diese gibt es verschiedene Methoden. Für kritische Distanzen bietet sich die so genannte ward-Methode an.
+
+```{r}
+data.hclust <- hclust(data.dist, method = "ward.D2")
+```
+
+Zur Darstellung des Clusterbaums kann man nun das entstandene Objekt einfach mit der Plotfunktion darstellen.
+
+```{r}
 plot(data.hclust)
 ```
+
+An den einzelnen Ästen des Baumes sind am Ende jeweils die Zeilen Namen der Objekte angetragen. Man kann diese jedoch auch zum Beispiel durch die Gruppenzugehörigkeit ersetzen. Hierzu wird die gewünschte Variable als "labels" mit angegeben
 
 ```{r}
 plot(data.hclust,labels = groups)
 ```
 
+Eine hierarchische Clusteranalyse produziert nicht ausschliesslich eine Lösung, sondern einen Ähnlichkeitsbaum. Möchten wir uns nun auf eine Anzahl von Clustern festlegen, so müssen wir "diesen Baum fällen". Der Befehl hier zu lautet cutree().
+
 ```{r}
 data.clusters <- cutree(data.hclust, k=4)
+data.clusters
+```
+
+Die daraus abgeleiteten Gruppen Zugehörigkeiten können wir nun nutzen, um eine Darstellung, zum Beispiel eine Hauptkomponentenanalyse, mit den abgeleiteten Gruppen ein zu färben.
+
+```{r}
 plot(data.pca$x[,1],data.pca$x[,2], col = data.clusters)
 ```
 
+Ein weiteres Clusterverfahren ist das so genannte kmeans-Verfahren. Dieses produziert häufig bessere Ergebnisse, verlangt aber, dass die Daten in euklidischen Distanz vorliegen. Zudem muss man vorher angeben, wie viel Cluster man erwartet. Genau diese Anzahl von Clustern wird dann auch eingeteilt.
+
 ```{r}
 data.kmeans <- kmeans(data, 4)
+```
+
+Auch diese Lösung können wir dann verwenden, um eine Darstellung entsprechend der Clusterzugehörigkeit ein zu färben.
+
+```{r}
 plot(data.pca$x[,1],data.pca$x[,2], col = data.kmeans$cluster)
 ```
 

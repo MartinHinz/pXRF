@@ -185,21 +185,16 @@ aggregate(data, list(groups), median)
 #> 3 259230.1 16.4079 20.3236  0.0000  0.0000   0.0000  228.2272 337.14 11156.223 6357.827
 #> 4 526194.5  0.0000  0.0000  0.0000  0.0000   0.0000    0.0000 229.17     0.000 1890.759
 aggregate(data, list(groups), sd)
-#>             Group.1        Nb         Zr          Y        Sr        Rb        Zn        Fe        Cr        V        Ti
-#> 1        Bodenprobe 3.3477570  50.019187  7.0396868 53.603027 26.514646 38.582532 10904.376 20.211533 21.93813 729.52042
-#> 2 Bodmerton_trocken 0.5977607   3.830115  0.9035888  3.300598  1.415240  2.269503   380.175  4.009671 16.96578  88.08895
-#> 3           Keramik 1.7338635  21.985727  4.4281578 14.702635  8.620389 35.922044  6994.825 16.643813 20.10917 622.50568
-#> 4             Silex 2.1882956 140.442675 21.2431749 21.776453  1.359933 44.130806 14287.856 20.522302 25.55750 585.19663
-#>           Ca         K        Al       Si       Th         Pb        Cu       Ni        Mn       Ba          P          S
-#> 1 30565.9848 3985.9489 11750.940 74130.06 5.798350 76.5879378 21.999829  0.00000 451.82378 23.59065  931.47167    40.1129
-#> 2   766.6247  342.4104  1275.231  1620.37 1.543405  0.6691061  6.012904 16.31789  15.01090 35.87299   47.69562   217.1251
-#> 3 10851.4002 3152.4474  9209.352 30797.56 6.260604  3.7453235 19.558400 57.74400  65.92515 59.41894 3661.75389 24395.6095
-#> 4 13624.8538  339.5079  6003.581 41493.61 0.000000  0.0000000  7.811600  0.00000 398.37450 31.94480  231.33505   362.2640
-#>          Mg
-#> 1  923.2636
-#> 2  576.6631
-#> 3 3635.1287
-#> 4 3949.5296
+#>             Group.1        Nb         Zr          Y        Sr        Rb        Zn        Fe        Cr        V        Ti         Ca
+#> 1        Bodenprobe 3.3477570  50.019187  7.0396868 53.603027 26.514646 38.582532 10904.376 20.211533 21.93813 729.52042 30565.9848
+#> 2 Bodmerton_trocken 0.5977607   3.830115  0.9035888  3.300598  1.415240  2.269503   380.175  4.009671 16.96578  88.08895   766.6247
+#> 3           Keramik 1.7338635  21.985727  4.4281578 14.702635  8.620389 35.922044  6994.825 16.643813 20.10917 622.50568 10851.4002
+#> 4             Silex 2.1882956 140.442675 21.2431749 21.776453  1.359933 44.130806 14287.856 20.522302 25.55750 585.19663 13624.8538
+#>           K        Al       Si       Th         Pb        Cu       Ni        Mn       Ba          P          S        Mg
+#> 1 3985.9489 11750.940 74130.06 5.798350 76.5879378 21.999829  0.00000 451.82378 23.59065  931.47167    40.1129  923.2636
+#> 2  342.4104  1275.231  1620.37 1.543405  0.6691061  6.012904 16.31789  15.01090 35.87299   47.69562   217.1251  576.6631
+#> 3 3152.4474  9209.352 30797.56 6.260604  3.7453235 19.558400 57.74400  65.92515 59.41894 3661.75389 24395.6095 3635.1287
+#> 4  339.5079  6003.581 41493.61 0.000000  0.0000000  7.811600  0.00000 398.37450 31.94480  231.33505   362.2640 3949.5296
 ```
 
 Dies bleibt jedoch in der puren Zahlenansicht nicht sehr intuitiv. Eine Graphische Darstellung wie ein Boxplot ist hier hilfreicher. Für einzelne Element geht das gut mit der Standard-Graphik
@@ -294,38 +289,38 @@ und darstellen
 
 ```r
 biplot(data.pca)
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
-#> angle and so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
+#> so skipped
 ```
 
 ![plot of chunk unnamed-chunk-22](figure/unnamed-chunk-22-1.png)
@@ -357,11 +352,11 @@ oder in ggplot
 ```r
 #install_github('fawda123/ggord')
 library(ggord)
+#> Error in library(ggord): there is no package called 'ggord'
 
 ggord(data.pca_scaled, groups, vec_ext = 5, exp = c(.1,.1))
+#> Error in ggord(data.pca_scaled, groups, vec_ext = 5, exp = c(0.1, 0.1)): could not find function "ggord"
 ```
-
-![plot of chunk unnamed-chunk-25](figure/unnamed-chunk-25-1.png)
 
 Eine weitere Möglichkeit, die Daten vorzubehandeln, um den Einfluss extremer Werte und Wertunterschiede zu verringern, ist die die Transformation, z.B. mittels des Logarithmus (zur Basis 10). Hierbei werden die ordinalen Unterschiede zwischen den einzelnen Messwerten bzw. Elementen nicht gänzlich aufgelöst, sondern nur abgeschwächt. Analog zur z-Transformation ist die Durchführung nicht kompliziert. Allerdings ist zu beachten, dass sich kein log10 von 0 bilden lässt. Daher bietet es sich an, auf jeden Werte einen (sehr kleinen) Wert aufzuaddieren, damit diese Problem umgangen wird.
 
@@ -369,43 +364,83 @@ Eine weitere Möglichkeit, die Daten vorzubehandeln, um den Einfluss extremer We
 ```r
 data.pca_log10 <- prcomp(log10(data.for_pca+0.1))
 ggord(data.pca_log10, groups, vec_ext = 5, exp = c(.1,.1))
+#> Error in ggord(data.pca_log10, groups, vec_ext = 5, exp = c(0.1, 0.1)): could not find function "ggord"
 ```
 
-![plot of chunk unnamed-chunk-26](figure/unnamed-chunk-26-1.png)
-
 ## Clusteranalyse
+
+Die Clusteranalyse ist ein Werkzeug, um Gruppenzugehörigkeit aufgrund von unterschiedlichen Merkmalen mittels eines Algorithmus zu definieren. Hierbei werden aufgrund von unterschiedlichen Verfahren Ähnlichkeiten zwischen den einzelnen Objekten festgelegt, und dann die jenigen Objekte zu Gruppen zusammen gefügt, die sich am ähnlichsten sind.
+
+Hierzu gibt es verschiedene Herangehensweisen. Eine Variante ist die so genannte hierarchische Clusteranalyse, bei der schrittweise Objekte in absteigender Ähnlichkeit zu einander zusammen gepackt werden. Hieraus entsteht ein so genannter Baum, der angebt, in welcher Reihenfolge Gruppierungen vorgenommen worden sind.
+
+Da wir es mit Messwerten zu tun haben, können wir für die Bestimmung von Ähnlichkeiten die euklidische Distanz benutzen. Das ist das Distanzmass, dass man auch aus dem Alltag kennt. Man kann es als Abstand in Bezug auf X und Y Koordinaten sehen. Mathematisch können aber auch beliebig viele Dimensionen berücksichtigt werden.
+
+Die Funktion, um diese Distanzen zu berechnen, ist die Funktion dist(). Ohne weitere Angabe der Distanzfunktion wird euklidische Distanz hiermit berechnet.
 
 
 ```r
 data.dist <- dist(data)
-data.hclust <- hclust(data.dist)
+```
+
+Die eigentliche Gruppierung in Cluster erfolgt nun mittels der Funktion hclust(). Auch für diese gibt es verschiedene Methoden. Für kritische Distanzen bietet sich die so genannte ward-Methode an.
+
+
+```r
+data.hclust <- hclust(data.dist, method = "ward.D2")
+```
+
+Zur Darstellung des Clusterbaums kann man nun das entstandene Objekt einfach mit der Plotfunktion darstellen.
+
+
+```r
 plot(data.hclust)
 ```
 
-![plot of chunk unnamed-chunk-27](figure/unnamed-chunk-27-1.png)
+![plot of chunk unnamed-chunk-29](figure/unnamed-chunk-29-1.png)
+
+An den einzelnen Ästen des Baumes sind am Ende jeweils die Zeilen Namen der Objekte angetragen. Man kann diese jedoch auch zum Beispiel durch die Gruppenzugehörigkeit ersetzen. Hierzu wird die gewünschte Variable als "labels" mit angegeben
 
 
 ```r
 plot(data.hclust,labels = groups)
 ```
 
-![plot of chunk unnamed-chunk-28](figure/unnamed-chunk-28-1.png)
+![plot of chunk unnamed-chunk-30](figure/unnamed-chunk-30-1.png)
+
+Eine hierarchische Clusteranalyse produziert nicht ausschliesslich eine Lösung, sondern einen Ähnlichkeitsbaum. Möchten wir uns nun auf eine Anzahl von Clustern festlegen, so müssen wir "diesen Baum fällen". Der Befehl hier zu lautet cutree().
 
 
 ```r
 data.clusters <- cutree(data.hclust, k=4)
+data.clusters
+#>  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+#>  1  1  1  1  1  1  1  1  2  2  2  1  3  3  3  3  3  1  3  3  3  4  4  4  4  4  4  4  4  4
+```
+
+Die daraus abgeleiteten Gruppen Zugehörigkeiten können wir nun nutzen, um eine Darstellung, zum Beispiel eine Hauptkomponentenanalyse, mit den abgeleiteten Gruppen ein zu färben.
+
+
+```r
 plot(data.pca$x[,1],data.pca$x[,2], col = data.clusters)
 ```
 
-![plot of chunk unnamed-chunk-29](figure/unnamed-chunk-29-1.png)
+![plot of chunk unnamed-chunk-32](figure/unnamed-chunk-32-1.png)
+
+Ein weiteres Clusterverfahren ist das so genannte kmeans-Verfahren. Dieses produziert häufig bessere Ergebnisse, verlangt aber, dass die Daten in euklidischen Distanz vorliegen. Zudem muss man vorher angeben, wie viel Cluster man erwartet. Genau diese Anzahl von Clustern wird dann auch eingeteilt.
 
 
 ```r
 data.kmeans <- kmeans(data, 4)
+```
+
+Auch diese Lösung können wir dann verwenden, um eine Darstellung entsprechend der Clusterzugehörigkeit ein zu färben.
+
+
+```r
 plot(data.pca$x[,1],data.pca$x[,2], col = data.kmeans$cluster)
 ```
 
-![plot of chunk unnamed-chunk-30](figure/unnamed-chunk-30-1.png)
+![plot of chunk unnamed-chunk-34](figure/unnamed-chunk-34-1.png)
 
 ## Diskriminanzanalyse (lda)
 
@@ -480,14 +515,13 @@ Die Werte zeigen zuerst die Anteile der jeweiligen Gruppen, dann deren Mittelwer
 plot(data.lda)
 ```
 
-![plot of chunk unnamed-chunk-32](figure/unnamed-chunk-32-1.png)
+![plot of chunk unnamed-chunk-36](figure/unnamed-chunk-36-1.png)
 
 Schöner mit Paketen, die auf ggplot basieren:
 
 
 ```r
 ggord(data.lda, data.for_lda$groups, vec_ext = 40, exp = c(.1,.1))
+#> Error in ggord(data.lda, data.for_lda$groups, vec_ext = 40, exp = c(0.1, : could not find function "ggord"
 ```
-
-![plot of chunk unnamed-chunk-33](figure/unnamed-chunk-33-1.png)
 
