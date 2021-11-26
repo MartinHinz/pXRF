@@ -16,9 +16,20 @@ knitr::opts_chunk$set(
 # pXRF
 
 <!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-The goal of pXRF is to ...
+The goal of pXRF is to help with the evaluation of pxrf data, especially at the moment from the Niton™ XL3t XRF Analyzer.
+
+This package is not in a production state yet!!!
+
+Meanwhile, it is used to present a evaluation strategy to a pxrf course at Bern University. You can access the rendered Rmarkdown-Documents that will result in the package functionality, but for the time being just show the workflow using other packages, here:
+
+- [basic_functionality.md](vignettes/basic_functionality.md) is actually how you can load pXRF data and preprocess them.
+- [analysis.md](vignettes/analysis.md) represents analytical procedures from simple scatterplots to pca and lda
+- [fine_calibration.md](vignettes/fine_calibration.md) explains how you can come up with fine calibration for our specific device
+
+Work in Progress!!!
 
 ## Installation
 
