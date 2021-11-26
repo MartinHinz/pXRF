@@ -10,14 +10,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
 
-```{r setup}
+
+
+```r
 library(pXRF)
 ```
 
@@ -25,7 +21,8 @@ library(pXRF)
 
 Wir gehen davon aus, dass die initialen Daten für die weiteren Schritte in Form von CSV Dateien vorliegen, die aus dem NDT Programm exportiert, und dann in Excel in CSV Dateien umgewandelt worden sind. Als erstes müssen wir den Pfad angeben, von dem wir die Datei importieren möchten.
 
-```{r}
+
+```r
 # Durch interaktive Wahl des Benutzers
 #source_csv <- file.choose()
 
@@ -39,7 +36,8 @@ Diese Ersetzung kann unterschiedlich geschehen. Entweder können wir die Angabe 
 
 Zudem gibt es zwei Versionen von CSV Dateien. Entweder ist der Dezimaltrenner ein ",", dann werden Spalten normalerweise durch ein ";" getrennt. Dies ist die europäische Version des CSV Datei. Anderenfalls ist der Dezimaltrenner ein Punkt ("."), Wie ist in der angloamerikanischen Version der Fall ist. In dem Fall ist der Dezimaltrenner ein ",". Diese Angaben müssen im Skript gegebenenfalls geändert werden, falls der Import nicht korrekt funktioniert.
 
-```{r}
+
+```r
 # Dezimaltrenner und Spaltentrenner festlegen, und wodurch "< LOD" ersetzt werden soll
 dec <- ","
 sep <- ";"
@@ -70,7 +68,8 @@ pxrf_data[data_columns][is.na(pxrf_data[data_columns])] <- lod
 ```
 Als Nächstes ist im Falle von Keramik Daten (Messmodus Mineralien) eine Feinkalibration durch zu führen, basierend auf der Kalibration, wie sie mittels eines stationären XRF-Apparatur für unser Gerät erstellt wurde. Diese beinhaltet nicht alle möglichen Elemente, sondern nur eine Auswahl:
 
-```{r}
+
+```r
 elements_fine_calibration <- c("Nb","Zr","Y","Sr","Rb","Th","Pb","Zn","Cu","Ni","Fe","Mn","Cr","V","Ti","Ba","Ca","K","Al","P","Si","S","Mg")
 pxrf_data.fine_calibration <- pxrf_data[elements_fine_calibration]
 ```
@@ -78,7 +77,8 @@ pxrf_data.fine_calibration <- pxrf_data[elements_fine_calibration]
 
 Die Faktoren hierfür können individuell für die einzelnen Elemente zugeordnet werden:
 
-```{r}
+
+```r
 pxrf_data.fine_calibration$Nb <-  pxrf_data.fine_calibration$Nb * 0.95
 pxrf_data.fine_calibration$Zr <- pxrf_data.fine_calibration$Zr * 1
 pxrf_data.fine_calibration$Y <- pxrf_data.fine_calibration$Y * 1.3
@@ -106,32 +106,37 @@ pxrf_data.fine_calibration$Mg <- pxrf_data.fine_calibration$Mg * 0.78
 
 Alternativ kann man auch eine im Rahmen dieses Paketes entwickelte Kurzfunktion nutzen
 
-```{r}
+
+```r
 pxrf_data.fine_calibration2 <- pXRF::fine_calibration_mineral(pxrf_data)
 ```
 Nun sollte man noch die Meta-Daten aus dem ursprünglichen Datensatz hinzufügen
 
-```{r}
+
+```r
 pxrf_data.fine_calibration2[,meta_columns] <- pxrf_data[,meta_columns]
 ```
 
 
 Jetzt können wir die Daten zwischenzeitlich abspeichern
 
-```{r}
+
+```r
 write.csv(pxrf_data.fine_calibration2, "data_feinkalibriert.csv")
 ```
 
 Jetzt legen wir fest, welches die Haupt- und welches die Spurenelemente für unsere Untersuchung sind. Diese Listen sind ggf. zu ändern:
 
-```{r}
+
+```r
 pxrf_data.main_elements<-pxrf_data.fine_calibration2[,c("Si","Ti","Al","Fe","Mn","Mg","Ca","K","P")]  # Gleiche die Fribourg verwendet. Evt. Auswahl treffen je nach Sample
 pxrf_data.trace_elements<-pxrf_data.fine_calibration2[,c("Nb","Zr","Y","Sr","Rb","Th","Pb","Zn","Cu","Ni","Cr","V","Ba","S")] # Evt. Auswahl z.B. Cu und S weglassen
 ```
 
 Desweiteren können wir nun die Oxide mittels Transformationsfaktoren berechnen:
 
-```{r}
+
+```r
 pxrf_data.oxide <- data.frame(
   matrix(
     nrow = nrow(pxrf_data),
@@ -153,14 +158,16 @@ pxrf_data.oxide$Sum<-apply(pxrf_data.oxide,1,sum,na.rm=T)
 ```
 Diese Oxidanteile können nun noch auf normierte Gewichtsprozente umgerechnet werden:
 
-```{r}
+
+```r
 pxrf_data.wt_oxide <- pxrf_data.oxide/pxrf_data.oxide$Sum * 100
 colnames(pxrf_data.wt_oxide) <- paste0(colnames(pxrf_data.wt_oxide), "_wt")
 ```
 
 und wieder die Metadaten hinzufügen
 
-```{r}
+
+```r
 pxrf_data.oxide[,meta_columns] <- pxrf_data[,meta_columns]
 pxrf_data.wt_oxide[,meta_columns] <- pxrf_data[,meta_columns]
 ```
@@ -168,7 +175,8 @@ pxrf_data.wt_oxide[,meta_columns] <- pxrf_data[,meta_columns]
 
 und diese Daten können wir nun ebenfalls absichern
 
-```{r}
+
+```r
 write.csv(pxrf_data.oxide, "oxide.csv")
 write.csv(pxrf_data.wt_oxide, "oxide_wt.csv")
 ```

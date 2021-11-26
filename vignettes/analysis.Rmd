@@ -1,0 +1,265 @@
+---
+title: "analysis"
+output:
+  html_document:
+    keep_md: true
+  rmarkdown::html_vignette:
+vignette: >
+  %\VignetteIndexEntry{analysis}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_knit$set(root.dir = '.')
+```
+
+```{r setup}
+library(pXRF)
+```
+
+Zuerst laden wir die bereinigten Daten ein:
+
+```{r}
+# Durch interaktive Wahl des Benutzers
+#source_csv <- file.choose()
+
+# Oder durch einen fest angestellten Pfad
+source_csv <- "data_feinkalibriert.csv"
+
+all_data <- read.csv(source_csv, row.names = 1)
+```
+
+Gegebenfalls können wir die Daten nun noch auf ein Kriterium hin filter, z.B. bezüglich des Messmodus (Type). Die zu filternde Spalte und den zu filternden Wert kann man entsprechend den Notwendigkeiten austauschen.
+
+```{r}
+data_ausw<-subset(all_data, Type == "Mining")
+```
+
+Als nächstes wollen wir die Daten hinsichtlich der Elementzusammensetzungen in Streudiagrammen darstellen, wobei immer die Werte bezüglich zweier Elemente gegeneinander geplottet werden.
+
+Dazu kann man auf bestimmte Spalten, und damit auf bestimmte Elemente auswählen:
+
+```{r}
+elements_selected <- c("Nb", "Zr", "Y", "Sr", "Rb",  "Zn",  "Fe",  "Cr", "V", "Ti",  "Ca", "K", "Al",  "Si", "Th", "Pb", "Cu", "Ni", "Mn", "Ba", "P","S", "Mg")
+
+# Alle Elemente: "Nb", "Zr", "Y", "Sr", "Rb", "Th", "Pb", "Zn", "Cu", "Ni", "Fe", "Mn", "Cr", "V", "Ti", "Ba", "Ca", "K", "Al", "P", "Si", "S", "Mg"
+# Th, Pb, Cu, Ni, Mn, Ba, und Mg oft unkonstant gemessen resp. P und S Kontamination, daher eher weglassen...
+
+data <- data_ausw[,elements_selected]
+```
+Jetzt kann man direkt den Plot vornehmen:
+
+```{r fig.dim = c(16, 12)}
+pairs(data, main="Streudiagramme der Messungen")
+```
+
+Hier werden jetzt sehr viele Elemente gegeneinander geplotted. Man kann die Auswahl auch beschränken, durch Angabe einzelner Elemente, oder durch die Spaltennummern
+
+```{r}
+pairs(data[,c("Ca", "K", "Al")], main="Streudiagramme der Messungen")
+```
+
+Falls man untergruppen deutlich machen möchte, kann man dies mittels Symbolen und/oder Farben tun:
+
+```{r}
+groups <- factor(all_data$NOTE)
+groups_num <- as.numeric(groups)
+groups_count <- length(unique(groups))
+
+pairs(data[,c("Ca", "K", "Al")],
+      main="Streudiagramme der Messungen",
+      col = rainbow(groups_count)[groups_num],
+      pch = groups_num
+      )
+```
+
+Um dies lesbarer zu machen, kann man noch eine Legende hinzufügen:
+
+```{r}
+pairs(data[,c("Ca", "K", "Al")],
+      main="Streudiagramme der Messungen",
+      col = rainbow(groups_count)[groups_num],
+      pch = groups_num
+      )
+legend("topright", legend=unique(groups), pch = unique(groups_num), col = rainbow(groups_count)[unique(groups_num)])
+```
+
+Die Legende sitzt nicht schön (bzw. ausserhalb des Plotbereiches), daher platzieren wir sie oberhalb des Plots
+
+```{r}
+pairs(data[,c("Ca", "K", "Al")],
+      main="Streudiagramme der Messungen",
+      col = rainbow(groups_count)[groups_num],
+      pch = groups_num, oma=c(10,3,3,3)
+      )
+
+legend("bottom", legend=unique(groups), pch = unique(groups_num), col = rainbow(groups_count)[unique(groups_num)],
+       xpd=T, horiz = T)
+
+```
+
+Das gleiche nochmal etwas schöner, unter Nutzung einer vordefinierten Funktion
+
+```{r}
+library(car)
+scatterplotMatrix(data[,c("Ca", "K", "Al")],
+                  diagonal=list(method ="histogram", breaks="FD"),
+                  smooth=FALSE)
+```
+
+Wir können auch zwei Elemente separat gegeneinander plotten:
+
+```{r}
+plot(data$Ca,
+     data$K)
+```
+
+Oder schöner:
+
+```{r}
+scatterplot(data$Ca,
+     data$K,groups=groups)
+```
+
+## Mittelwerte und Standardabweichungen
+
+Die Frage, ob sich die einzelnen Gruppen unterscheiden, macht sich ja daran fest, ob sich die Messwerte zwischen diesen unterscheiden. Dabei streuen die Messwerte innerhalb der Gruppen je Einzelmessung (gleiches oder unterschiedliches Objekt) ja auch mess- und materialbedingt. Das Kriterium, ob man Gruppen identifizieren kann, ist dabei, ob die Unterschiede innerhalb der Gruppen kleiner sind als die Unterschiede zwischen den Gruppen.
+
+Hierzu sind zwei deskriptive Eigenschaften von Bedeutung:
+- Der Mittelwert (oder einer der Varianten von Mittelwerten) gibt an, welche Werte die Gruppe insgesamt aufweist
+- Die Standardabweichung gibt an, wie die Daten um diesen Mittelwert streuen.
+
+Wir können uns diese Werte recht einfach mittels einer bequemen R-Funktion anzeigen lassen
+
+```{r}
+aggregate(data, list(groups), mean)
+aggregate(data, list(groups), median)
+aggregate(data, list(groups), sd)
+```
+
+Dies bleibt jedoch in der puren Zahlenansicht nicht sehr intuitiv. Eine Graphische Darstellung wie ein Boxplot ist hier hilfreicher. Für einzelne Element geht das gut mit der Standard-Graphik
+
+```{r}
+boxplot(data$Si ~ groups)
+```
+
+Für komplexere Darstellungen (viele Elemente + Gruppen gleichzeitig) gibt es die ggplot Bibliothek. Als erstes müssen wir dazu unsere Daten in das "Lange" format übertragen
+
+```{r}
+library(reshape2)
+data_long <- melt(cbind(data,groups))
+```
+
+Jetzt können wir diese dann auch mit Standard-Graphik darstellen, das bleibt aber unbefriedigend, da es sehr viele Elemente hat, die sich auch in ihren Messbereichen deutlich unterscheiden:
+
+```{r}
+boxplot(value ~ variable + groups, data = data_long)
+```
+
+Besser ist es, wenn wir die einzelnen Plots per Element unterteilen
+
+```{r fig.dim=c(16,12)}
+library(ggplot2)
+
+ggplot(data = data_long) + geom_boxplot(aes(fill=groups, y = value)) + facet_wrap(.~variable, scales = "free_y")
+```
+
+Wollen wir nun schauen, ob sich 2 Gruppen in Bezug auf ihre Ausprägungen in Einzelnen Elementen signifikant unterscheiden, so können wir einen einfachen nichtparametrischen Test anwenden, wie z.B. den Wilcoxon Rang-Summen-Test.
+
+```{r}
+wilcox.test(data$Si[groups=="Keramik"], data$Si[groups=="Silex"])
+```
+
+oder für alle Gruppen zugleich
+```{r}
+pairwise.wilcox.test(data$Si, groups)
+```
+
+## PCA
+
+Um latente Variablen zu identifizieren, die mehrere (oder alle) Elemente gleichzeitig beeinflussen, bietet sich die Hauptkomponentenanalyse (principal component analysis, pca) an. Hierzu dürfen keine NA-Werte in den Daten vorhanden sein. Filtern wir sicherheitshalber erst mal dazu in dieser Hinsicht:
+
+```{r}
+# 1 for rows, 2 for columns
+na_columns <- apply(data,2,anyNA)
+
+data.for_pca <- data[,!na_columns]
+```
+
+Jetzt können wir die Hauptkomponentenanalyse selbst durchführen:
+
+```{r}
+data.pca <- prcomp(data.for_pca)
+```
+
+und darstellen
+
+```{r}
+biplot(data.pca)
+```
+
+Häufig unterscheiden sich die einzelnen Elemente hinsichtlich der Grössenordnung ihrer Messwerte. Um besonders häufig enthaltene Element nicht überzubewerten, bzw. um Spurenelement nicht unterzubewerten, bietet es sich an, diese auf ein gleiches Mass zu normieren. Hierzu wird die sogenannte z-Transformation angewendet, die für alle Werte:
+
+- den Mittelwert pro Element bestimmt und diesen von allen Elementen subtrahiert. Dadurch wird der Mittelwert für alle auf Null gesetzt.
+- die Standardabweichung für alle Elemente bestimmt und durch diese teilt. Damit haben alle Elemente eine Standardabweichung von 1.
+
+Dadurch werden die Grössenordnungen aller Elemente angeglichen, und ihr Einfluss auf die PCA damit ebenso. In R können wir das durch eine einfache Zugabe einer weiteren Option erreichen:
+
+```{r}
+data.pca_scaled <- prcomp(data.for_pca, scale. = T)
+```
+
+Und wiederum dargestellt:
+
+```{r}
+biplot(data.pca_scaled)
+```
+
+oder in ggplot
+
+```{r}
+#install_github('fawda123/ggord')
+library(ggord)
+
+ggord(data.pca_scaled, groups, vec_ext = 5, exp = c(.1,.1))
+```
+
+Eine weitere Möglichkeit, die Daten vorzubehandeln, um den Einfluss extremer Werte und Wertunterschiede zu verringern, ist die die Transformation, z.B. mittels des Logarithmus (zur Basis 10). Hierbei werden die ordinalen Unterschiede zwischen den einzelnen Messwerten bzw. Elementen nicht gänzlich aufgelöst, sondern nur abgeschwächt. Analog zur z-Transformation ist die Durchführung nicht kompliziert. Allerdings ist zu beachten, dass sich kein log10 von 0 bilden lässt. Daher bietet es sich an, auf jeden Werte einen (sehr kleinen) Wert aufzuaddieren, damit diese Problem umgangen wird.
+
+```{r}
+data.pca_log10 <- prcomp(log10(data.for_pca+0.1))
+ggord(data.pca_log10, groups, vec_ext = 5, exp = c(.1,.1))
+```
+
+
+## Diskriminanzanalyse (lda)
+
+Die Diskriminanzanalyse ist ein Verfahren, um herauszufinden, welche Elemente zwei Gruppen in einem Datensatz am besten unterscheiden. Das heisst, wir haben schon eine Gruppeneinteilung, und möchten nun herausfinden, worin die Unterschiede zwischen diesen Gruppen bestehen.
+
+```{r}
+library(MASS)
+data.for_lda <- data
+data.for_lda$groups <- groups
+data.lda <- lda(groups ~ ., data = data.for_lda)
+data.lda
+```
+
+Die Werte zeigen zuerst die Anteile der jeweiligen Gruppen, dann deren Mittelwerte bezüglich der Elemente, schliesslich die Diskriminanzkoeffizienten. Diese zeigen auf, ob ein Element eher auf die Zugehörigkeit zur einen oder zur anderen Gruppe hinweist. Deutlicher wird dies, wenn wir und das dazu noch graphisch darstellen:
+
+```{r}
+plot(data.lda)
+```
+
+Schöner mit Paketen, die auf ggplot basieren:
+
+```{r}
+ggord(data.lda, data.for_lda$groups, vec_ext = 40, exp = c(.1,.1))
+```
+
