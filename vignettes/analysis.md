@@ -70,14 +70,31 @@ pairs(data[,c("Ca", "K", "Al")], main="Streudiagramme der Messungen")
 
 ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
 
-Falls man untergruppen deutlich machen möchte, kann man dies mittels Symbolen und/oder Farben tun:
+Falls man untergruppen deutlich machen möchte, kann man dies mittels Symbolen und/oder Farben tun. Ich habe die Spalte "NOTE" in der ursprünglichen Tabelle genutzt, um eine Gruppenzugehörigkeit mittels einzelner Werte zuzuordnen. Bei mir sind dies die einzelnen Materialgruppen. Dies kann aber auch alles andere mögliche sein, dass eine Gruppenzugehörigkeit für den jeweiligen Datensatz sinnvoll erscheinen lässt.
 
 
 ```r
-groups <- factor(all_data$NOTE)
+data_ausw$NOTE
+#>  [1] "Bodmerton_trocken" "Bodmerton_trocken" "Bodmerton_trocken" "Bodmerton_trocken" "Bodmerton_trocken" "Bodenprobe"       
+#>  [7] "Bodenprobe"        "Bodenprobe"        "Bodenprobe"        "Bodenprobe"        "Bodenprobe"        "Bodenprobe"       
+#> [13] "Keramik"           "Keramik"           "Keramik"           "Keramik"           "Keramik"           "Keramik"          
+#> [19] "Keramik"           "Keramik"           "Keramik"           "Silex"             "Silex"             "Silex"            
+#> [25] "Silex"             "Silex"             "Silex"             "Silex"             "Silex"             "Silex"
+```
+
+Diese Informationen übertrage ich in eine eigene Variable, die ich groups nenne. Farbdarstellung bedingt dies als numerische Werte, daher lege ich eine weitere Variable groups_num an, in der den Gruppen einfach aufsteigende Zahlen zugeordnet werden. Schliesslich brauch ich für die automatische Farbdarstellung noch die gesamtzahl von Gruppen, die ich in groups_count notieren lasse.
+
+
+```r
+groups <- factor(data_ausw$NOTE)
 groups_num <- as.numeric(groups)
 groups_count <- length(unique(groups))
+```
 
+Im folgenden benutze ich die Funktion rainbow, um mir automatisch eine bestimmte Anzahl (gleich der Anzahl der Gruppen) von Farben ausgeben zu lassen, die ich für das Einfärben verwenden kann. Gleichzeitig benutze ich die option "pch", um unterschiedliche Symbole für die einzelnen Gruppen darzustellen. Eigentlich braucht man nur eine der beiden Optionen, um eine Zuordnung im Plot und für die Auswertung treffen zu können...
+
+
+```r
 pairs(data[,c("Ca", "K", "Al")],
       main="Streudiagramme der Messungen",
       col = rainbow(groups_count)[groups_num],
@@ -85,9 +102,30 @@ pairs(data[,c("Ca", "K", "Al")],
       )
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
 
-Um dies lesbarer zu machen, kann man noch eine Legende hinzufügen:
+Weis man um die Zahl der Gruppen, und möchte man diese immer gleich färben, so bietet es sich an, die Farbpalette einmal zu definieren, um sie immer wieder verwenden zu können. Dies ist ganz einfach, die meisten gängigen Farbennamen erkennt R.
+
+
+```r
+my_colors <- c("blue", "red", "green", "black")
+
+pairs(data[,c("Ca", "K", "Al")],
+      main="Streudiagramme der Messungen",
+      col = my_colors[groups_num],
+      pch = groups_num
+      )
+```
+
+![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png)
+
+Alle bekannten Farbnamen kann man mit folgendem Befehl einsehen (den ich allerdings auskommentiert habe):
+
+```r
+# colors()
+```
+
+Um die Zuordnung von Farben oder Symbolen im Plot anzuzeigen, kann man noch eine Legende hinzufügen:
 
 
 ```r
@@ -99,9 +137,9 @@ pairs(data[,c("Ca", "K", "Al")],
 legend("topright", legend=unique(groups), pch = unique(groups_num), col = rainbow(groups_count)[unique(groups_num)])
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
 
-Die Legende sitzt nicht schön (bzw. ausserhalb des Plotbereiches), daher platzieren wir sie oberhalb des Plots
+Die Legende sitzt nicht schön (bzw. ausserhalb des Plotbereiches), daher platzieren wir sie unterhalb des Plots
 
 
 ```r
@@ -115,7 +153,7 @@ legend("bottom", legend=unique(groups), pch = unique(groups_num), col = rainbow(
        xpd=T, horiz = T)
 ```
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
 
 Das gleiche nochmal etwas schöner, unter Nutzung einer vordefinierten Funktion
 
@@ -127,7 +165,7 @@ scatterplotMatrix(data[,c("Ca", "K", "Al")],
                   smooth=FALSE)
 ```
 
-![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png)
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
 
 Wir können auch zwei Elemente separat gegeneinander plotten:
 
@@ -137,7 +175,7 @@ plot(data$Ca,
      data$K)
 ```
 
-![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
+![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15-1.png)
 
 Oder schöner:
 
@@ -148,7 +186,7 @@ scatterplot(data$Ca,
 #> Warning in smoother(.x[subs], .y[subs], col = col[i], log.x = logged("x"), : could not fit smooth
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
+![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png)
 
 ## Mittelwerte und Standardabweichungen
 
@@ -185,16 +223,21 @@ aggregate(data, list(groups), median)
 #> 3 259230.1 16.4079 20.3236  0.0000  0.0000   0.0000  228.2272 337.14 11156.223 6357.827
 #> 4 526194.5  0.0000  0.0000  0.0000  0.0000   0.0000    0.0000 229.17     0.000 1890.759
 aggregate(data, list(groups), sd)
-#>             Group.1        Nb         Zr          Y        Sr        Rb        Zn        Fe        Cr        V        Ti         Ca
-#> 1        Bodenprobe 3.3477570  50.019187  7.0396868 53.603027 26.514646 38.582532 10904.376 20.211533 21.93813 729.52042 30565.9848
-#> 2 Bodmerton_trocken 0.5977607   3.830115  0.9035888  3.300598  1.415240  2.269503   380.175  4.009671 16.96578  88.08895   766.6247
-#> 3           Keramik 1.7338635  21.985727  4.4281578 14.702635  8.620389 35.922044  6994.825 16.643813 20.10917 622.50568 10851.4002
-#> 4             Silex 2.1882956 140.442675 21.2431749 21.776453  1.359933 44.130806 14287.856 20.522302 25.55750 585.19663 13624.8538
-#>           K        Al       Si       Th         Pb        Cu       Ni        Mn       Ba          P          S        Mg
-#> 1 3985.9489 11750.940 74130.06 5.798350 76.5879378 21.999829  0.00000 451.82378 23.59065  931.47167    40.1129  923.2636
-#> 2  342.4104  1275.231  1620.37 1.543405  0.6691061  6.012904 16.31789  15.01090 35.87299   47.69562   217.1251  576.6631
-#> 3 3152.4474  9209.352 30797.56 6.260604  3.7453235 19.558400 57.74400  65.92515 59.41894 3661.75389 24395.6095 3635.1287
-#> 4  339.5079  6003.581 41493.61 0.000000  0.0000000  7.811600  0.00000 398.37450 31.94480  231.33505   362.2640 3949.5296
+#>             Group.1        Nb         Zr          Y        Sr        Rb        Zn        Fe        Cr        V        Ti
+#> 1        Bodenprobe 3.3477570  50.019187  7.0396868 53.603027 26.514646 38.582532 10904.376 20.211533 21.93813 729.52042
+#> 2 Bodmerton_trocken 0.5977607   3.830115  0.9035888  3.300598  1.415240  2.269503   380.175  4.009671 16.96578  88.08895
+#> 3           Keramik 1.7338635  21.985727  4.4281578 14.702635  8.620389 35.922044  6994.825 16.643813 20.10917 622.50568
+#> 4             Silex 2.1882956 140.442675 21.2431749 21.776453  1.359933 44.130806 14287.856 20.522302 25.55750 585.19663
+#>           Ca         K        Al       Si       Th         Pb        Cu       Ni        Mn       Ba          P          S
+#> 1 30565.9848 3985.9489 11750.940 74130.06 5.798350 76.5879378 21.999829  0.00000 451.82378 23.59065  931.47167    40.1129
+#> 2   766.6247  342.4104  1275.231  1620.37 1.543405  0.6691061  6.012904 16.31789  15.01090 35.87299   47.69562   217.1251
+#> 3 10851.4002 3152.4474  9209.352 30797.56 6.260604  3.7453235 19.558400 57.74400  65.92515 59.41894 3661.75389 24395.6095
+#> 4 13624.8538  339.5079  6003.581 41493.61 0.000000  0.0000000  7.811600  0.00000 398.37450 31.94480  231.33505   362.2640
+#>          Mg
+#> 1  923.2636
+#> 2  576.6631
+#> 3 3635.1287
+#> 4 3949.5296
 ```
 
 Dies bleibt jedoch in der puren Zahlenansicht nicht sehr intuitiv. Eine Graphische Darstellung wie ein Boxplot ist hier hilfreicher. Für einzelne Element geht das gut mit der Standard-Graphik
@@ -204,7 +247,7 @@ Dies bleibt jedoch in der puren Zahlenansicht nicht sehr intuitiv. Eine Graphisc
 boxplot(data$Si ~ groups)
 ```
 
-![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
+![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png)
 
 Für komplexere Darstellungen (viele Elemente + Gruppen gleichzeitig) gibt es die ggplot Bibliothek. Als erstes müssen wir dazu unsere Daten in das "Lange" format übertragen
 
@@ -222,7 +265,7 @@ Jetzt können wir diese dann auch mit Standard-Graphik darstellen, das bleibt ab
 boxplot(value ~ variable + groups, data = data_long)
 ```
 
-![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png)
+![plot of chunk unnamed-chunk-20](figure/unnamed-chunk-20-1.png)
 
 Besser ist es, wenn wir die einzelnen Plots per Element unterteilen
 
@@ -233,7 +276,7 @@ library(ggplot2)
 ggplot(data = data_long) + geom_boxplot(aes(fill=groups, y = value)) + facet_wrap(.~variable, scales = "free_y")
 ```
 
-![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-17-1.png)
+![plot of chunk unnamed-chunk-21](figure/unnamed-chunk-21-1.png)
 
 Wollen wir nun schauen, ob sich 2 Gruppen in Bezug auf ihre Ausprägungen in Einzelnen Elementen signifikant unterscheiden, so können wir einen einfachen nichtparametrischen Test anwenden, wie z.B. den Wilcoxon Rang-Summen-Test.
 
@@ -289,41 +332,41 @@ und darstellen
 
 ```r
 biplot(data.pca)
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 
-#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate angle and
-#> so skipped
+#> Warning in arrows(0, 0, y[, 1L] * 0.8, y[, 2L] * 0.8, col = col[2L], length = arrow.len): zero-length arrow is of indeterminate
+#> angle and so skipped
 ```
 
-![plot of chunk unnamed-chunk-22](figure/unnamed-chunk-22-1.png)
+![plot of chunk unnamed-chunk-26](figure/unnamed-chunk-26-1.png)
 
 Häufig unterscheiden sich die einzelnen Elemente hinsichtlich der Grössenordnung ihrer Messwerte. Um besonders häufig enthaltene Element nicht überzubewerten, bzw. um Spurenelement nicht unterzubewerten, bietet es sich an, diese auf ein gleiches Mass zu normieren. Hierzu wird die sogenannte z-Transformation angewendet, die für alle Werte:
 
@@ -344,28 +387,80 @@ Und wiederum dargestellt:
 biplot(data.pca_scaled)
 ```
 
-![plot of chunk unnamed-chunk-24](figure/unnamed-chunk-24-1.png)
-
-oder in ggplot
-
-
-```r
-#install_github('fawda123/ggord')
-library(ggord)
-#> Error in library(ggord): there is no package called 'ggord'
-
-ggord(data.pca_scaled, groups, vec_ext = 5, exp = c(.1,.1))
-#> Error in ggord(data.pca_scaled, groups, vec_ext = 5, exp = c(0.1, 0.1)): could not find function "ggord"
-```
+![plot of chunk unnamed-chunk-28](figure/unnamed-chunk-28-1.png)
 
 Eine weitere Möglichkeit, die Daten vorzubehandeln, um den Einfluss extremer Werte und Wertunterschiede zu verringern, ist die die Transformation, z.B. mittels des Logarithmus (zur Basis 10). Hierbei werden die ordinalen Unterschiede zwischen den einzelnen Messwerten bzw. Elementen nicht gänzlich aufgelöst, sondern nur abgeschwächt. Analog zur z-Transformation ist die Durchführung nicht kompliziert. Allerdings ist zu beachten, dass sich kein log10 von 0 bilden lässt. Daher bietet es sich an, auf jeden Werte einen (sehr kleinen) Wert aufzuaddieren, damit diese Problem umgangen wird.
 
 
 ```r
 data.pca_log10 <- prcomp(log10(data.for_pca+0.1))
-ggord(data.pca_log10, groups, vec_ext = 5, exp = c(.1,.1))
-#> Error in ggord(data.pca_log10, groups, vec_ext = 5, exp = c(0.1, 0.1)): could not find function "ggord"
 ```
+
+## Schönere Darstellung mit ggplot
+
+Es gibt verschiedene Pakete, mit denen die Durchführung einer PCA erleichtert, und/oder mit der die Darstellung schöner gestaltet werden kann. Ein Quasi-Standart im Moment ist die Graphikbibliothek ggplot2 und daraus abgeleitete Darstellungsformen. Diese Funktionalitäten kann man mittels Zusatz-Paketen installieren.
+
+Zusatz-Pakete sind entweder in den offiziellen Paketquellen verfügbar, oder sie haben es noch nicht in diese geschafft, und müssen z.B. von GitHub installiert werden.
+
+Ein Paket, dass speziell für die Darstellung von Hauptkomponenten, oder ähnlichen Verfahren, enwickelt ist, ist ggord. Dieses ist nicht aus den Offiziellen Quellen installierbar, sondern muss mittels eines weiteren Pakets, "devtools", von GitHub installiert werden.
+
+Die folgenden Befehle für die Paket-Installation sind auskommentiert, damit sie nicht im Laufe des Scriptes hier jedes mal ausgeführt werden. Wenn gewünscht, bitte den Bereich hinter dem '#' markieren und auf Run klicken (oder anderweitig ausführen).
+
+Als erstes installieren wir 'devtools':
+
+
+```r
+# install.packages("devtools")
+```
+
+Jetzt machen wir das frisch installierte Paket devtools verfügbar, mittels des Befehls "library()":
+
+
+```r
+# library(devtools)
+```
+
+Nun können wir das Paket ggord aus dem Repository auf GitHub (https://github.com/fawda123/ggord/) installieren:
+
+
+```r
+# install_github('fawda123/ggord')
+```
+
+Alles weitere wieder unkommentiert, denn nun gehe ich davon aus, das ggord installiert ist. Wir laden ggord und führen die Darstellung durch. Zu bemerken sind folgende Parameter:
+
+- der erste Wert in der Klammer gibt das darzustellende Resultat der Hauptkomponentenanalyse an
+- der zweite Wert (vec_ext) gibt an, dass die Pfeile grösser (oder kleiner) dargestellt werden. 1 ist unverändert, werte über 1 vergrössern, werte unter 1 verkleinern
+- der dritte Wert (exp) bewirkt, dass das Diagramm etwas grösser dargestellt wird, als der eigentliche Wertebereich ist. Das verhindert, dass Punkte zu dicht am Rand sind.
+
+
+```r
+library(ggord)
+
+ggord(data.pca_scaled, vec_ext = 5, exp = c(.1,.1))
+```
+
+![plot of chunk unnamed-chunk-33](figure/unnamed-chunk-33-1.png)
+
+Wenn wir jetzt vordefinierte Gruppen haben, können wir diese im Plot kenntlich machen
+
+
+```r
+library(ggord)
+
+ggord(data.pca_scaled, grp_in = groups, vec_ext = 5, exp = c(.1,.1))
+```
+
+![plot of chunk unnamed-chunk-34](figure/unnamed-chunk-34-1.png)
+
+Ebenso können wir alle skalierten und transformierten PCAs darstellen:
+
+
+```r
+ggord(data.pca_log10, groups, vec_ext = 5, exp = c(.1,.1))
+```
+
+![plot of chunk unnamed-chunk-35](figure/unnamed-chunk-35-1.png)
 
 ## Clusteranalyse
 
@@ -396,7 +491,7 @@ Zur Darstellung des Clusterbaums kann man nun das entstandene Objekt einfach mit
 plot(data.hclust)
 ```
 
-![plot of chunk unnamed-chunk-29](figure/unnamed-chunk-29-1.png)
+![plot of chunk unnamed-chunk-38](figure/unnamed-chunk-38-1.png)
 
 An den einzelnen Ästen des Baumes sind am Ende jeweils die Zeilen Namen der Objekte angetragen. Man kann diese jedoch auch zum Beispiel durch die Gruppenzugehörigkeit ersetzen. Hierzu wird die gewünschte Variable als "labels" mit angegeben
 
@@ -405,7 +500,7 @@ An den einzelnen Ästen des Baumes sind am Ende jeweils die Zeilen Namen der Obj
 plot(data.hclust,labels = groups)
 ```
 
-![plot of chunk unnamed-chunk-30](figure/unnamed-chunk-30-1.png)
+![plot of chunk unnamed-chunk-39](figure/unnamed-chunk-39-1.png)
 
 Eine hierarchische Clusteranalyse produziert nicht ausschliesslich eine Lösung, sondern einen Ähnlichkeitsbaum. Möchten wir uns nun auf eine Anzahl von Clustern festlegen, so müssen wir "diesen Baum fällen". Der Befehl hier zu lautet cutree().
 
@@ -424,7 +519,7 @@ Die daraus abgeleiteten Gruppen Zugehörigkeiten können wir nun nutzen, um eine
 plot(data.pca$x[,1],data.pca$x[,2], col = data.clusters)
 ```
 
-![plot of chunk unnamed-chunk-32](figure/unnamed-chunk-32-1.png)
+![plot of chunk unnamed-chunk-41](figure/unnamed-chunk-41-1.png)
 
 Ein weiteres Clusterverfahren ist das so genannte kmeans-Verfahren. Dieses produziert häufig bessere Ergebnisse, verlangt aber, dass die Daten in euklidischen Distanz vorliegen. Zudem muss man vorher angeben, wie viel Cluster man erwartet. Genau diese Anzahl von Clustern wird dann auch eingeteilt.
 
@@ -440,7 +535,7 @@ Auch diese Lösung können wir dann verwenden, um eine Darstellung entsprechend 
 plot(data.pca$x[,1],data.pca$x[,2], col = data.kmeans$cluster)
 ```
 
-![plot of chunk unnamed-chunk-34](figure/unnamed-chunk-34-1.png)
+![plot of chunk unnamed-chunk-43](figure/unnamed-chunk-43-1.png)
 
 ## Diskriminanzanalyse (lda)
 
@@ -515,13 +610,14 @@ Die Werte zeigen zuerst die Anteile der jeweiligen Gruppen, dann deren Mittelwer
 plot(data.lda)
 ```
 
-![plot of chunk unnamed-chunk-36](figure/unnamed-chunk-36-1.png)
+![plot of chunk unnamed-chunk-45](figure/unnamed-chunk-45-1.png)
 
 Schöner mit Paketen, die auf ggplot basieren:
 
 
 ```r
 ggord(data.lda, data.for_lda$groups, vec_ext = 40, exp = c(.1,.1))
-#> Error in ggord(data.lda, data.for_lda$groups, vec_ext = 40, exp = c(0.1, : could not find function "ggord"
 ```
+
+![plot of chunk unnamed-chunk-46](figure/unnamed-chunk-46-1.png)
 

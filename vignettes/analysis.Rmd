@@ -66,13 +66,23 @@ Hier werden jetzt sehr viele Elemente gegeneinander geplotted. Man kann die Ausw
 pairs(data[,c("Ca", "K", "Al")], main="Streudiagramme der Messungen")
 ```
 
-Falls man untergruppen deutlich machen möchte, kann man dies mittels Symbolen und/oder Farben tun:
+Falls man untergruppen deutlich machen möchte, kann man dies mittels Symbolen und/oder Farben tun. Ich habe die Spalte "NOTE" in der ursprünglichen Tabelle genutzt, um eine Gruppenzugehörigkeit mittels einzelner Werte zuzuordnen. Bei mir sind dies die einzelnen Materialgruppen. Dies kann aber auch alles andere mögliche sein, dass eine Gruppenzugehörigkeit für den jeweiligen Datensatz sinnvoll erscheinen lässt.
 
 ```{r}
-groups <- factor(all_data$NOTE)
+data_ausw$NOTE
+```
+
+Diese Informationen übertrage ich in eine eigene Variable, die ich groups nenne. Farbdarstellung bedingt dies als numerische Werte, daher lege ich eine weitere Variable groups_num an, in der den Gruppen einfach aufsteigende Zahlen zugeordnet werden. Schliesslich brauch ich für die automatische Farbdarstellung noch die gesamtzahl von Gruppen, die ich in groups_count notieren lasse.
+
+```{r}
+groups <- factor(data_ausw$NOTE)
 groups_num <- as.numeric(groups)
 groups_count <- length(unique(groups))
+```
 
+Im folgenden benutze ich die Funktion rainbow, um mir automatisch eine bestimmte Anzahl (gleich der Anzahl der Gruppen) von Farben ausgeben zu lassen, die ich für das Einfärben verwenden kann. Gleichzeitig benutze ich die option "pch", um unterschiedliche Symbole für die einzelnen Gruppen darzustellen. Eigentlich braucht man nur eine der beiden Optionen, um eine Zuordnung im Plot und für die Auswertung treffen zu können...
+
+```{r}
 pairs(data[,c("Ca", "K", "Al")],
       main="Streudiagramme der Messungen",
       col = rainbow(groups_count)[groups_num],
@@ -80,7 +90,24 @@ pairs(data[,c("Ca", "K", "Al")],
       )
 ```
 
-Um dies lesbarer zu machen, kann man noch eine Legende hinzufügen:
+Weis man um die Zahl der Gruppen, und möchte man diese immer gleich färben, so bietet es sich an, die Farbpalette einmal zu definieren, um sie immer wieder verwenden zu können. Dies ist ganz einfach, die meisten gängigen Farbennamen erkennt R.
+
+```{r}
+my_colors <- c("blue", "red", "green", "black")
+
+pairs(data[,c("Ca", "K", "Al")],
+      main="Streudiagramme der Messungen",
+      col = my_colors[groups_num],
+      pch = groups_num
+      )
+```
+
+Alle bekannten Farbnamen kann man mit folgendem Befehl einsehen (den ich allerdings auskommentiert habe):
+```{r}
+# colors()
+```
+
+Um die Zuordnung von Farben oder Symbolen im Plot anzuzeigen, kann man noch eine Legende hinzufügen:
 
 ```{r}
 pairs(data[,c("Ca", "K", "Al")],
@@ -91,7 +118,7 @@ pairs(data[,c("Ca", "K", "Al")],
 legend("topright", legend=unique(groups), pch = unique(groups_num), col = rainbow(groups_count)[unique(groups_num)])
 ```
 
-Die Legende sitzt nicht schön (bzw. ausserhalb des Plotbereiches), daher platzieren wir sie oberhalb des Plots
+Die Legende sitzt nicht schön (bzw. ausserhalb des Plotbereiches), daher platzieren wir sie unterhalb des Plots
 
 ```{r}
 pairs(data[,c("Ca", "K", "Al")],
@@ -102,7 +129,6 @@ pairs(data[,c("Ca", "K", "Al")],
 
 legend("bottom", legend=unique(groups), pch = unique(groups_num), col = rainbow(groups_count)[unique(groups_num)],
        xpd=T, horiz = T)
-
 ```
 
 Das gleiche nochmal etwas schöner, unter Nutzung einer vordefinierten Funktion
@@ -222,19 +248,63 @@ Und wiederum dargestellt:
 biplot(data.pca_scaled)
 ```
 
-oder in ggplot
-
-```{r}
-#install_github('fawda123/ggord')
-library(ggord)
-
-ggord(data.pca_scaled, groups, vec_ext = 5, exp = c(.1,.1))
-```
-
 Eine weitere Möglichkeit, die Daten vorzubehandeln, um den Einfluss extremer Werte und Wertunterschiede zu verringern, ist die die Transformation, z.B. mittels des Logarithmus (zur Basis 10). Hierbei werden die ordinalen Unterschiede zwischen den einzelnen Messwerten bzw. Elementen nicht gänzlich aufgelöst, sondern nur abgeschwächt. Analog zur z-Transformation ist die Durchführung nicht kompliziert. Allerdings ist zu beachten, dass sich kein log10 von 0 bilden lässt. Daher bietet es sich an, auf jeden Werte einen (sehr kleinen) Wert aufzuaddieren, damit diese Problem umgangen wird.
 
 ```{r}
 data.pca_log10 <- prcomp(log10(data.for_pca+0.1))
+```
+
+## Schönere Darstellung mit ggplot
+
+Es gibt verschiedene Pakete, mit denen die Durchführung einer PCA erleichtert, und/oder mit der die Darstellung schöner gestaltet werden kann. Ein Quasi-Standart im Moment ist die Graphikbibliothek ggplot2 und daraus abgeleitete Darstellungsformen. Diese Funktionalitäten kann man mittels Zusatz-Paketen installieren.
+
+Zusatz-Pakete sind entweder in den offiziellen Paketquellen verfügbar, oder sie haben es noch nicht in diese geschafft, und müssen z.B. von GitHub installiert werden.
+
+Ein Paket, dass speziell für die Darstellung von Hauptkomponenten, oder ähnlichen Verfahren, enwickelt ist, ist ggord. Dieses ist nicht aus den Offiziellen Quellen installierbar, sondern muss mittels eines weiteren Pakets, "devtools", von GitHub installiert werden.
+
+Die folgenden Befehle für die Paket-Installation sind auskommentiert, damit sie nicht im Laufe des Scriptes hier jedes mal ausgeführt werden. Wenn gewünscht, bitte den Bereich hinter dem '#' markieren und auf Run klicken (oder anderweitig ausführen).
+
+Als erstes installieren wir 'devtools':
+
+```{r}
+# install.packages("devtools")
+```
+
+Jetzt machen wir das frisch installierte Paket devtools verfügbar, mittels des Befehls "library()":
+
+```{r}
+# library(devtools)
+```
+
+Nun können wir das Paket ggord aus dem Repository auf GitHub (https://github.com/fawda123/ggord/) installieren:
+
+```{r}
+# install_github('fawda123/ggord')
+```
+
+Alles weitere wieder unkommentiert, denn nun gehe ich davon aus, das ggord installiert ist. Wir laden ggord und führen die Darstellung durch. Zu bemerken sind folgende Parameter:
+
+- der erste Wert in der Klammer gibt das darzustellende Resultat der Hauptkomponentenanalyse an
+- der zweite Wert (vec_ext) gibt an, dass die Pfeile grösser (oder kleiner) dargestellt werden. 1 ist unverändert, werte über 1 vergrössern, werte unter 1 verkleinern
+- der dritte Wert (exp) bewirkt, dass das Diagramm etwas grösser dargestellt wird, als der eigentliche Wertebereich ist. Das verhindert, dass Punkte zu dicht am Rand sind.
+
+```{r}
+library(ggord)
+
+ggord(data.pca_scaled, vec_ext = 5, exp = c(.1,.1))
+```
+
+Wenn wir jetzt vordefinierte Gruppen haben, können wir diese im Plot kenntlich machen
+
+```{r}
+library(ggord)
+
+ggord(data.pca_scaled, grp_in = groups, vec_ext = 5, exp = c(.1,.1))
+```
+
+Ebenso können wir alle skalierten und transformierten PCAs darstellen:
+
+```{r}
 ggord(data.pca_log10, groups, vec_ext = 5, exp = c(.1,.1))
 ```
 
